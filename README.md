@@ -22,7 +22,7 @@
 <p>
   <img alt="Python" src="https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white">
   <img alt="OSINT" src="https://img.shields.io/badge/OSINT-Recon-111827?style=for-the-badge">
-  <img alt="Report" src="https://img.shields.io/badge/Reports-HTML%20%7C%20JSON%20%7C%20TXT-111827?style=for-the-badge">
+  <img alt="Reports" src="https://img.shields.io/badge/Reports-HTML%20%7C%20JSON%20%7C%20TXT-111827?style=for-the-badge">
 </p>
 
 **Samurai**, hedef bir domain için OSINT kaynaklarından URL/Subdomain havuzu toplar ve dork/wordlist eşleştirmesi ile potansiyel hassas endpoint’leri **CRITICAL / HIGH / NORMAL** olarak sınıflandırır.
@@ -91,19 +91,100 @@ cd Samurai
 pip install -r requirements.txt
 ```
 
-## requirements.txt
+**requirements.txt**
+- `requests`
+- `fake-useragent`
 
-requests
-fake-useragent
+---
 
 ## Kullanım
 
-> Hızlı Başlangıç
+### Hızlı Başlangıç
+```bash
 python3 samurai.py -d example.com -w dorks.txt
-> Thread Sayısını Arttırma
+```
+
+### Thread Sayısını Arttırma
+```bash
 python3 samurai.py -d example.com -w dorks.txt -t 50
-> HTML Rapor Alma
+```
+
+### HTML Rapor Alma
+```bash
 python3 samurai.py -d example.com -w dorks.txt -o report.html
-> JSON / TXT Rapor Alma
+```
+
+### JSON / TXT Rapor Alma
+```bash
 python3 samurai.py -d example.com -w dorks.txt -o report.json
 python3 samurai.py -d example.com -w dorks.txt -o report.txt
+```
+
+---
+
+## Parametreler
+
+| Parametre | Açıklama | Varsayılan |
+|---|---|---|
+| `-d, --domain` | Hedef domain (örn: `example.com`) | zorunlu |
+| `-w, --wordlist` | Dork/wordlist dosyası | zorunlu |
+| `-t, --threads` | Thread sayısı (1–200 arası clamp) | `30` |
+| `-o, --output` | Çıktı dosyası (`.html` / `.json` / `.txt`) | HTML |
+| `-v, --verbose` | Detaylı log | kapalı |
+
+---
+
+## Çıktılar (Raporlar)
+
+### HTML (Varsayılan)
+- Modern, okunur tek dosya rapor
+- CRITICAL/HIGH/NORMAL sayıları ile özet
+- Link’ler tıklanabilir
+
+### JSON
+- Otomasyon / pipeline için uygun
+- `summary` + `results[]` yapısı
+
+### TXT
+- Hızlı paylaşım / terminal-friendly çıktı
+
+---
+
+## Örnek Wordlist / Dorks
+
+Samurai `inurl`, `filetype`, `ext` benzeri yaklaşımları destekler.
+
+Örnek `dorks.txt`:
+```txt
+inurl:admin
+inurl:login
+inurl:dashboard
+inurl:config
+inurl:backup
+inurl:upload
+filetype:env
+filetype:sql
+filetype:log
+ext:bak
+intitle:"index of"
+```
+
+> İpucu: Çok genel dork’lar gürültüyü arttırır. Hedefe göre listeyi özelleştirmek en iyi sonuç verir.
+
+---
+
+## Notlar & Limitler
+- Bazı servisler (özellikle ücretsiz endpoint’ler) rate-limit uygulayabilir.
+- Çıktılar “potansiyel” bulgudur; doğrulama (manual/automated) gerektirir.
+- Statik dosya ve bazı path’ler filtrelenir (noise azaltmak için).
+
+---
+
+## Güvenlik / Yasal Uyarı
+Bu araç yalnızca **yetkili olduğunuz** sistemlerde güvenlik testi ve OSINT amaçlı kullanılmalıdır.  
+Yetkisiz kullanım yasa dışı olabilir. Kullanım sorumluluğu kullanıcıya aittir.
+
+---
+
+## License
+MIT — detaylar için: [LICENSE](./LICENSE)
