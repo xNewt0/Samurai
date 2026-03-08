@@ -89,3 +89,21 @@ Samurai aşağıdaki kaynaklardan veri toplar:
 git clone https://github.com/xNewt0/Samurai.git
 cd Samurai
 pip install -r requirements.txt
+```
+
+## requirements.txt
+
+requests
+fake-useragent
+
+## Kullanım
+
+> Hızlı Başlangıç
+python3 samurai.py -d example.com -w dorks.txt
+> Thread Sayısını Arttırma
+python3 samurai.py -d example.com -w dorks.txt -t 50
+> HTML Rapor Alma
+python3 samurai.py -d example.com -w dorks.txt -o report.html
+> JSON / TXT Rapor Alma
+python3 samurai.py -d example.com -w dorks.txt -o report.json
+python3 samurai.py -d example.com -w dorks.txt -o report.txt
