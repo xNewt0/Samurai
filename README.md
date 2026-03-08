@@ -82,68 +82,10 @@ Samurai aşağıdaki kaynaklardan veri toplar:
 ---
 
 ## Kurulum
+
 > Python **3.8+** önerilir.
 
 ```bash
 git clone https://github.com/xNewt0/Samurai.git
 cd Samurai
 pip install -r requirements.txt
-requirements.txt
-
-requests
-fake-useragent
-Kullanım
-Hızlı Başlangıç
-python3 samurai.py -d example.com -w dorks.txt
-Thread Sayısını Arttırma
-python3 samurai.py -d example.com -w dorks.txt -t 50
-HTML Rapor Alma
-python3 samurai.py -d example.com -w dorks.txt -o report.html
-JSON / TXT Rapor Alma
-python3 samurai.py -d example.com -w dorks.txt -o report.json
-python3 samurai.py -d example.com -w dorks.txt -o report.txt
-Parametreler
-Parametre	Açıklama	Varsayılan
--d, --domain	Hedef domain (örn: example.com)	zorunlu
--w, --wordlist	Dork/wordlist dosyası	zorunlu
--t, --threads	Thread sayısı (1–200 arası clamp)	30
--o, --output	Çıktı dosyası (.html/.json/.txt)	HTML
--v, --verbose	Detaylı log	kapalı
-Çıktılar (Raporlar)
-HTML (Varsayılan)
-Modern, okunur tek dosya rapor
-CRITICAL/HIGH/NORMAL sayıları ile özet
-Link’ler tıklanabilir
-JSON
-Otomasyon / pipeline için uygun
-summary + results[] yapısı
-TXT
-Hızlı paylaşım / terminal-friendly çıktı
-Örnek Wordlist / Dorks
-Samurai inurl, filetype, ext benzeri yaklaşımları destekler.
-
-Örnek dorks.txt:
-
-inurl:admin
-inurl:login
-inurl:dashboard
-inurl:config
-inurl:backup
-inurl:upload
-filetype:env
-filetype:sql
-filetype:log
-ext:bak
-intitle:"index of"
-İpucu: Çok genel dork’lar gürültüyü arttırır. Hedefe göre listeyi özelleştirmek en iyi sonuç verir.
-
-Notlar & Limitler
-Bazı servisler (özellikle ücretsiz endpoint’ler) rate-limit uygulayabilir.
-Çıktılar “potansiyel” bulgudur; doğrulama (manual/automated) gerektirir.
-Statik dosya ve bazı path’ler filtrelenir (noise azaltmak için).
-Güvenlik / Yasal Uyarı
-Bu araç yalnızca yetkili olduğunuz sistemlerde güvenlik testi ve OSINT amaçlı kullanılmalıdır.
-Yetkisiz kullanım yasa dışı olabilir. Kullanım sorumluluğu kullanıcıya aittir.
-
-License
-MIT — detaylar için: LICENSE
