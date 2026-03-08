@@ -3,7 +3,6 @@
 # 侍 Samurai
 ### Domain Reconnaissance & Dork Scanner
 
-<!-- Badges -->
 <p>
   <a href="https://github.com/xNewt0/Samurai/stargazers">
     <img alt="Stars" src="https://img.shields.io/github/stars/xNewt0/Samurai?style=for-the-badge">
@@ -38,6 +37,7 @@
 - [Kurulum](#kurulum)
 - [Kullanım](#kullanım)
 - [Parametreler](#parametreler)
+- [Konfigürasyon (Opsiyonel)](#konfigürasyon-opsiyonel)
 - [Çıktılar (Raporlar)](#çıktılar-raporlar)
 - [Örnek Wordlist / Dorks](#örnek-wordlist--dorks)
 - [Notlar & Limitler](#notlar--limitler)
@@ -54,30 +54,29 @@
 3. **Dork / Wordlist Eşleştirme**
    - `inurl:` / `filetype:` / `ext:` gibi kalıpları destekler.
 4. **Severity Sınıflandırma**
-   - `.env`, `.sql`, `.bak`, `wp-config`, `.git` gibi bulguları öne çıkarır.
+   - `.env`, `.sql`, `.bak`, `wp-config`, `.git` vb. sinyalleri öne çıkarır.
 5. **Raporlama**
    - **HTML (varsayılan)**, JSON veya TXT rapor üretir.
 
 ---
 
 ## Özellikler
-- ✅ Multi-source OSINT URL havuzu
-- ✅ Noise azaltma (stopwords + statik dosya filtreleri)
-- ✅ Thread’li eşleştirme (hızlı tarama)
+- ✅ Multi-source OSINT URL havuzu (Wayback / HackerTarget / OTX)
+- ✅ Gürültü azaltma (static extension + path filtreleri + stopwords)
+- ✅ Performans odaklı eşleştirme (URL token index + ext index)
 - ✅ Severity: **CRITICAL / HIGH / NORMAL**
-- ✅ Çıktı formatları: **HTML / JSON / TXT**
-- ✅ Terminalde renkli özet ve ön izleme
+- ✅ Rapor formatları: **HTML / JSON / TXT**
+- ✅ HTML raporda arama + severity filtreleme
+- ✅ Kolay kullanım: `-w` opsiyonel, dahili geniş dork seti
 
 ---
 
 ## Veri Kaynakları
-Samurai aşağıdaki kaynaklardan veri toplar:
-
 - **Wayback Machine (CDX)** — arşiv URL’leri
 - **HackerTarget (hostsearch)** — subdomain sinyali
 - **AlienVault OTX** — URL listeleri
 
-> Not: Bazı servislerin rate-limit / kota limitleri olabilir.
+> Not: Bazı servisler rate-limit / kota uygulayabilir.
 
 ---
 
@@ -99,25 +98,35 @@ pip install -r requirements.txt
 
 ## Kullanım
 
-### Hızlı Başlangıç
+### En kolay kullanım (dahili dorks + otomatik HTML rapor)
+```bash
+python3 samurai.py -d example.com
+```
+
+### Kendi wordlist’in ile
 ```bash
 python3 samurai.py -d example.com -w dorks.txt
 ```
 
-### Thread Sayısını Arttırma
+### Thread sayısını arttırma
 ```bash
-python3 samurai.py -d example.com -w dorks.txt -t 50
+python3 samurai.py -d example.com -t 50
 ```
 
-### HTML Rapor Alma
+### JSON/TXT rapor
 ```bash
-python3 samurai.py -d example.com -w dorks.txt -o report.html
+python3 samurai.py -d example.com --format json
+python3 samurai.py -d example.com --format txt
 ```
 
-### JSON / TXT Rapor Alma
+### Report’u stdout’a bas (pipeline)
 ```bash
-python3 samurai.py -d example.com -w dorks.txt -o report.json
-python3 samurai.py -d example.com -w dorks.txt -o report.txt
+python3 samurai.py -d example.com --format json -o -
+```
+
+### Kaynakları kapatma (örn: sadece Wayback)
+```bash
+python3 samurai.py -d example.com --no-otx --no-hackertarget
 ```
 
 ---
@@ -126,27 +135,66 @@ python3 samurai.py -d example.com -w dorks.txt -o report.txt
 
 | Parametre | Açıklama | Varsayılan |
 |---|---|---|
-| `-d, --domain` | Hedef domain (örn: `example.com`) | zorunlu |
-| `-w, --wordlist` | Dork/wordlist dosyası | zorunlu |
-| `-t, --threads` | Thread sayısı (1–200 arası clamp) | `30` |
-| `-o, --output` | Çıktı dosyası (`.html` / `.json` / `.txt`) | HTML |
+| `-d, --domain` | Hedef domain (örn: `example.com`) | **zorunlu** |
+| `-w, --wordlist` | Dork/wordlist dosyası (opsiyonel) | dahili liste |
+| `-t, --threads` | Eşleştirme thread sayısı (1–200) | `30` |
+| `-o, --output` | Output dosyası (veya `-` → stdout) | otomatik isim |
+| `--format` | `html` / `json` / `txt` | `html` |
+| `--no-report` | Rapor yazma | kapalı |
 | `-v, --verbose` | Detaylı log | kapalı |
+| `-q, --quiet` | Minimal çıktı | kapalı |
+| `--no-color` | ANSI renk kapat | kapalı |
+| `--version` | Versiyon yazdır ve çık | kapalı |
+| `--timeout` | HTTP timeout (sn) | `30` |
+| `--retries` | HTTP retry sayısı | `2` |
+| `--backoff` | Retry backoff (sn) | `0.7` |
+| `--max-urls` | Havuz maksimum URL | `75000` |
+| `--wayback-limit` | Wayback CDX limit | `50000` |
+| `--otx-pages` | OTX sayfa sayısı (500/page) | `3` |
+| `--no-wayback` | Wayback kapat | kapalı |
+| `--no-hackertarget` | HackerTarget kapat | kapalı |
+| `--no-otx` | OTX kapat | kapalı |
+| `--no-ext-filter` | Static ext filtresi kapat | kapalı |
+| `--no-path-filter` | Path filtresi kapat | kapalı |
+| `--no-stopwords` | Stopwords filtresi kapat | kapalı |
+| `--resolve-subdomains` | Subdomain’leri DNS resolve edip ekle | kapalı |
+| `--config` | JSON config ile filtreleri override et | kapalı |
+
+---
+
+## Konfigürasyon (Opsiyonel)
+Bazı filtreleri dışarıdan yönetmek için `--config` ile JSON dosyası verebilirsin.
+
+Örnek `config.json`:
+```json
+{
+  "banned_ext": [".png", ".jpg", ".css", ".js"],
+  "banned_path": ["/assets/", "/static/", "/vendor/"],
+  "stopwords": ["the", "and", "www", "http", "https"],
+  "crit_patterns": [".env", "wp-config", ".git", ".sql", ".bak"],
+  "hot_keywords": ["admin", "login", "swagger", "graphql", "config"]
+}
+```
+
+Kullanım:
+```bash
+python3 samurai.py -d example.com --config config.json
+```
 
 ---
 
 ## Çıktılar (Raporlar)
 
 ### HTML (Varsayılan)
-- Modern, okunur tek dosya rapor
-- CRITICAL/HIGH/NORMAL sayıları ile özet
-- Link’ler tıklanabilir
+- Arama kutusu + severity filtreleri
+- Tek dosya rapor
 
 ### JSON
-- Otomasyon / pipeline için uygun
-- `summary` + `results[]` yapısı
+- Otomasyon/pipeline için uygun
+- `results[]` içinde URL bazlı `hits[]` (eşleşen dork/term/type)
 
 ### TXT
-- Hızlı paylaşım / terminal-friendly çıktı
+- CRITICAL/HIGH/NORMAL bölümlere ayrılmış çıktı
 
 ---
 
@@ -166,7 +214,6 @@ filetype:env
 filetype:sql
 filetype:log
 ext:bak
-intitle:"index of"
 ```
 
 > İpucu: Çok genel dork’lar gürültüyü arttırır. Hedefe göre listeyi özelleştirmek en iyi sonuç verir.
@@ -176,7 +223,7 @@ intitle:"index of"
 ## Notlar & Limitler
 - Bazı servisler (özellikle ücretsiz endpoint’ler) rate-limit uygulayabilir.
 - Çıktılar “potansiyel” bulgudur; doğrulama (manual/automated) gerektirir.
-- Statik dosya ve bazı path’ler filtrelenir (noise azaltmak için).
+- Filtreler noise azaltır; gerektiğinde `--no-*-filter` ile kapatılabilir.
 
 ---
 
